@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Santo Enigma — O Jogo da Bem-Aventurança</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3A6B;--gold:#B8860B;--gold-lt:#F5EDD0;--gold-md:#D4A017;
+  --red:#8B1A1A;--purple:#4A1A6B;--green:#1A5C1A;--cream:#FDF8F0;
+  --ink:#1A1A2E;--muted:#666;--border:#DDD;
+  --inf:#1A4D8B;--pub:#1A5C1A;--pax:#8B1A1A;--res:#7A5800;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Lato',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+#app{display:flex;min-height:100vh;max-width:1100px;margin:0 auto}
+#sidebar{width:260px;flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-brand{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-cross{font-size:28px;color:var(--gold-md);display:block;text-align:center;margin-bottom:8px}
+.sb-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:#F5EDD0;text-align:center;letter-spacing:.1em;line-height:1.2}
+.sb-sub{font-family:'Playfair Display',serif;font-size:12px;font-style:italic;color:rgba(212,160,23,.9);text-align:center;margin-top:4px}
+.sb-meta{font-size:11px;color:rgba(245,237,208,.45);text-align:center;margin-top:8px;letter-spacing:.05em}
+.sb-nav{flex:1;padding:16px 0}
+.sb-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(212,160,23,.7);padding:10px 20px 6px}
+.sb-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 20px;border:none;background:none;cursor:pointer;text-align:left;transition:background .15s;color:rgba(245,237,208,.75);font-family:'Lato',sans-serif;font-size:13px}
+.sb-item:hover{background:rgba(255,255,255,.08);color:#F5EDD0}
+.sb-item.active{background:rgba(180,134,11,.2);color:#F5EDD0;border-left:3px solid var(--gold-md)}
+.sb-item.active .sb-num{color:var(--gold-md)}
+.sb-num{font-family:'Cinzel',serif;font-size:10px;color:rgba(212,160,23,.6);min-width:18px}
+.sb-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);text-align:center}
+.sb-footer span{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;color:rgba(212,160,23,.5)}
+#main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+#cover{background:var(--navy);padding:80px 60px 72px;text-align:center;position:relative;overflow:hidden;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#cover::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 10%,rgba(180,134,11,.15) 0%,transparent 65%)}
+.cov-cross{font-size:60px;color:var(--gold-md);display:block;margin-bottom:20px;position:relative;animation:glow 3s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:1}50%{opacity:.75}}
+.cov-title{font-family:'Cinzel',serif;font-size:56px;font-weight:700;color:#F5EDD0;letter-spacing:.12em;position:relative;line-height:1}
+.cov-sub{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold-md);font-style:italic;margin-top:10px;position:relative}
+.cov-ver{font-family:'Lato',sans-serif;font-size:13px;color:rgba(245,237,208,.6);letter-spacing:.25em;text-transform:uppercase;margin-top:6px;position:relative}
+.cov-rule{width:120px;height:2px;background:var(--gold-md);margin:28px auto;position:relative}
+.cov-meta{font-family:'Lato',sans-serif;font-size:15px;color:rgba(245,237,208,.8);position:relative;line-height:2;letter-spacing:.03em}
+.cov-quote{font-family:'Playfair Display',serif;font-style:italic;font-size:17px;color:rgba(245,237,208,.65);margin-top:40px;position:relative;max-width:440px}
+.cov-quote cite{display:block;font-family:'Lato',sans-serif;font-style:normal;font-size:13px;color:var(--gold-md);margin-top:6px}
+.cov-btn{margin-top:40px;position:relative;display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border:2px solid var(--gold-md);border-radius:4px;background:none;cursor:pointer;font-family:'Cinzel',serif;font-size:13px;font-weight:600;letter-spacing:.12em;color:var(--gold-md);transition:all .2s}
+.cov-btn:hover{background:var(--gold-md);color:var(--navy)}
+#chapter{flex:1;padding:52px 56px 72px;max-width:780px}
+.ch-eyebrow{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.ch-title{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--navy);line-height:1.15}
+.ch-rule{width:60px;height:3px;background:var(--gold-md);margin:18px 0 28px}
+.lead{font-family:'Playfair Display',serif;font-size:18px;font-style:italic;color:var(--navy);line-height:1.65;margin-bottom:20px}
+.prose{font-size:15px;line-height:1.8;color:var(--ink);margin-bottom:16px;text-align:justify}
+.prose strong{font-weight:700;color:var(--navy)}
+.callout{background:var(--gold-lt);border-left:3px solid var(--gold-md);padding:18px 22px;margin:24px 0;border-radius:0 8px 8px 0}
+.callout-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--navy);margin-bottom:10px}
+.callout p{font-size:14px;line-height:1.7;color:var(--ink);margin:5px 0}
+.callout.info{background:#E8F0F8;border-color:var(--navy)}
+.callout.danger{background:#F8E8E8;border-color:var(--red)}
+.indagation{background:var(--navy);border-radius:10px;padding:24px 28px;margin:24px 0;text-align:center}
+.indagation p{font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:#F5EDD0;line-height:1.8}
+.indagation strong{color:var(--gold-md);font-style:normal}
+.mystery-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0}
+.mcard{border-radius:10px;padding:20px;border:1px solid rgba(0,0,0,.07)}
+.mcard-icon{font-size:28px;margin-bottom:10px}
+.mcard-name{font-family:'Cinzel',serif;font-size:14px;font-weight:700;margin-bottom:8px}
+.mcard-desc{font-size:13px;line-height:1.6;color:var(--ink)}
+.mcard-desc strong{font-weight:700}
+.m-inf{background:#EAF3FA}.m-inf .mcard-name{color:var(--inf)}
+.m-pub{background:#EAF5EA}.m-pub .mcard-name{color:var(--pub)}
+.m-pax{background:#FAECEC}.m-pax .mcard-name{color:var(--pax)}
+.m-res{background:var(--gold-lt)}.m-res .mcard-name{color:var(--res)}
+.vtable{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+.vtable th{background:var(--navy);color:#fff;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;padding:10px 12px;text-align:left}
+.vtable td{padding:10px 12px;border-bottom:1px solid #EEE;vertical-align:top;line-height:1.55}
+.vtable tr:last-child td{border-bottom:none}
+.vtable tr:nth-child(even) td{background:#F8F6F0}
+.vname{font-weight:700;color:var(--navy);white-space:nowrap}
+.char-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.char-card{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.char-name{font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.char-role{font-size:11px;color:var(--gold);font-weight:700;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase}
+.char-bio{font-size:13px;color:var(--muted);line-height:1.55}
+.steps{margin:24px 0}
+.step{display:flex;gap:16px;margin-bottom:20px}
+.step-num{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;font-family:'Cinzel',serif;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-body h4{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--navy);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.step-body p{font-size:14px;line-height:1.65;color:var(--ink)}
+.rules-list{list-style:none;margin:12px 0}
+.rules-list li{display:flex;gap:10px;font-size:14px;line-height:1.55;padding:9px 0;border-bottom:1px solid #F0EDE5;color:var(--ink)}
+.rules-list li:last-child{border-bottom:none}
+.icon-ok{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--green);min-width:20px}
+.icon-no{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--red);min-width:20px}
+.ficha{border:2px solid var(--gold-md);border-radius:10px;overflow:hidden;margin:24px 0}
+.ficha-hdr{background:var(--navy);padding:12px 18px;display:flex;justify-content:space-between;align-items:center}
+.ficha-hdr span{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;color:#F5EDD0}
+.ficha-body{display:grid;grid-template-columns:1fr 1fr 1fr}
+.ficha-col{padding:16px;border-right:1px solid var(--gold-lt)}
+.ficha-col:last-child{border-right:none}
+.ficha-col h4{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px}
+.ficha-col h4.cp{color:var(--navy)}.ficha-col h4.cv{color:var(--red)}.ficha-col h4.cm{color:var(--purple)}
+.fi{display:flex;align-items:center;gap:7px;font-size:12px;padding:4px 0;color:var(--ink)}
+.cb{width:13px;height:13px;border:1.5px solid var(--gold-md);border-radius:2px;flex-shrink:0}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.mode-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px;border-top:3px solid var(--gold-md)}
+.mode-card h4{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--navy);letter-spacing:.08em;margin-bottom:8px;text-transform:uppercase}
+.mode-card p{font-size:13px;line-height:1.6;color:var(--muted)}
+.closing{text-align:center;padding:32px 0 20px}
+.cross-row{font-size:28px;color:var(--gold-md);letter-spacing:20px;margin-bottom:20px;display:block}
+.closing blockquote{font-family:'Playfair Display',serif;font-style:italic;font-size:18px;color:var(--navy);line-height:1.65;margin-bottom:8px}
+.closing cite{font-family:'Lato',sans-serif;font-style:normal;font-size:13px;color:var(--gold)}
+.amdg{font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:var(--navy);letter-spacing:.15em;margin-top:28px}
+.amdg-sub{font-size:13px;color:var(--muted);font-style:italic;margin-top:6px}
+#nav-bar{background:#fff;border-top:1px solid var(--border);padding:16px 56px;display:flex;justify-content:space-between;align-items:center;position:sticky;bottom:0}
+.nav-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border:1.5px solid var(--navy);border-radius:4px;background:none;cursor:pointer;font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--navy);transition:all .18s}
+.nav-btn:hover{background:var(--navy);color:#fff}
+.nav-btn:disabled{opacity:.25;cursor:default;pointer-events:none}
+.nav-prog{font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:.1em}
+#mob-header{display:none;background:var(--navy);padding:14px 20px;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+#mob-menu-btn{background:none;border:none;cursor:pointer;color:#F5EDD0;font-size:22px;padding:0}
+#mob-title{font-family:'Cinzel',serif;font-size:14px;color:#F5EDD0;letter-spacing:.1em;flex:1;text-align:center}
+#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200}
+@media(max-width:720px){
+  #sidebar{display:none;position:fixed;left:0;top:0;bottom:0;z-index:300;transform:translateX(-100%);transition:transform .25s}
+  #sidebar.open{display:flex;transform:translateX(0)}
+  #sidebar-overlay.open{display:block}
+  #mob-header{display:flex}
+  #app{flex-direction:column}
+  #chapter{padding:32px 24px 48px}
+  #nav-bar{padding:14px 24px}
+  .mystery-grid,.char-grid,.mode-grid{grid-template-columns:1fr}
+  .ficha-body{grid-template-columns:1fr}
+  .ficha-col{border-right:none;border-bottom:1px solid var(--gold-lt)}
+  .cov-title{font-size:38px}
+  .ch-title{font-size:28px}
+  #cover{padding:56px 32px 56px;min-height:auto}
+}
+</style>
+</head>
+<body>
+<div id="mob-header">
+  <button id="mob-menu-btn" onclick="toggleSidebar()">☰</button>
+  <span id="mob-title">SANTO ENIGMA</span>
+</div>
+<div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+<div id="app">
+  <nav id="sidebar">
+    <div class="sb-brand">
+      <span class="sb-cross">✝</span>
+      <div class="sb-title">SANTO ENIGMA</div>
+      <div class="sb-sub">O Jogo da Bem-Aventurança</div>
+      <div class="sb-meta">Mistérios da Vida de Cristo</div>
+    </div>
+    <div class="sb-nav" id="sb-nav"></div>
+    <div class="sb-footer"><span>CHAMA VIVA · 2026</span></div>
+  </nav>
+  <div id="main">
+    <section id="cover">
+      <span class="cov-cross">✝</span>
+      <div class="cov-title">SANTO ENIGMA</div>
+      <div class="cov-sub">O Jogo da Bem-Aventurança</div>
+      <div class="cov-ver">Versão dos Mistérios da Vida de Cristo</div>
+      <div class="cov-rule"></div>
+      <div class="cov-meta">
+        Jogo de cartas de dedução &nbsp;·&nbsp; 3 a 6 jogadores<br>
+        A partir de 8 anos &nbsp;·&nbsp; 30–50 minutos<br>
+        <strong style="color:rgba(245,237,208,.9)">17 cartas</strong> &nbsp;·&nbsp; 6 personagens · 7 virtudes · 4 mistérios
+      </div>
+      <div class="cov-quote">
+        "Eu sou o caminho, a verdade e a vida."
+        <cite>— João 14,6</cite>
+      </div>
+      <button class="cov-btn" onclick="goto(0)">COMEÇAR A LER →</button>
+    </section>
+    <main>
+      <div id="chapter"></div>
+      <div id="nav-bar">
+        <button class="nav-btn" id="btn-prev" onclick="prevChapter()">← Anterior</button>
+        <span class="nav-prog" id="nav-prog"></span>
+        <button class="nav-btn" id="btn-next" onclick="nextChapter()">Próximo →</button>
+      </div>
+    </main>
+  </div>
+</div>
+<script>
+const chapters=[
+{title:"A História",eyebrow:"Narrativa",render:()=>`
+<p class="lead">Todo cristão é chamado a contemplar e a viver o mistério completo da vida de Cristo: da manjedoura à ressurreição. A vivência do evangelho não é mera imaginação: é a própria vida de Jesus tornando-se carne novamente em cada discípulo.</p>
+<p class="prose">Nos grandes santos, vemos sempre essa configuração com Cristo, esse ser moldado pela graça à imagem do Mestre. Mas há algo mais: assim como há diferentes carismas e espiritualidades na Igreja, há almas que foram especialmente convidadas a contemplar e a viver um mistério particular da vida de Cristo. São Francisco de Assis, fascinado pela pobreza e simplicidade da Cruz. Santa Clara, com os três Amores. São João da Cruz, mergulhado no Mistério Pascal. Santa Teresa de Ávila, que foi visitada pelo Menino Deus.</p>
+<p class="prose">Em uma comunidade de fé, um dos fiéis alcançou a graça da Bem-aventurança. Ao longo de sua vida, viveu heroicamente uma virtude e foi especialmente convidado por Deus a contemplar e a viver um Mistério particular da vida de Cristo, aquele que mais marcou sua espiritualidade, sua oração e seu modo de ser no mundo.</p>
+<div class="callout"><div class="callout-title">O Mistério a Resolver</div><p>✝ &nbsp;<strong>Quem</strong> alcançou a Bem-aventurança?</p><p>✝ &nbsp;<strong>Qual virtude</strong> viveu de forma heroica?</p><p>✝ &nbsp;<strong>Qual Mistério de Cristo</strong> mais marcou sua espiritualidade?</p></div>
+<p class="prose">Você e os demais jogadores são investigadores da fé — chamados a descobrir, por dedução e discernimento honesto, os sinais que marcaram essa santidade oculta.</p>`},
+
+{title:"Componentes",eyebrow:"O Baralho",render:()=>`
+<p class="prose">Santo Enigma é jogado <strong>exclusivamente com cartas</strong>. Todo o jogo acontece nas mãos dos jogadores e nos registros das fichas de anotação.</p>
+<div class="callout info"><div class="callout-title">Distribuição do Baralho — 17 cartas</div><p>6 Cartas de Personagens &nbsp;·&nbsp; 7 Cartas de Virtudes &nbsp;·&nbsp; 4 Cartas de Mistérios</p><p style="margin-top:6px;font-size:13px;opacity:.8">+ Fichas de Anotação (1 por jogador)</p></div>
+<div class="ch-rule" style="margin-top:28px"></div><div class="ch-eyebrow">6 Cartas de Personagens</div>
+<p class="prose">Cada personagem representa uma alma comum, um fiel do povo de Deus, alguém como você ou como eu, chamado à santidade pela vida cotidiana:</p>
+<div class="char-grid">
+  <div class="char-card"><div class="char-name">RAFAEL</div><div class="char-role">Adulto, 38 anos</div><div class="char-bio">Profissional bem-sucedido que encontrou na fé a bússola de sua vida. Fiel à Igreja e à família, com uma busca constante pelas virtudes. Nunca perde a Santa Missa, mesmo nas semanas mais difíceis.</div></div>
+  <div class="char-card"><div class="char-name">ANA</div><div class="char-role">Adulta, 42 anos</div><div class="char-bio">Professora e catequista apaixonada pela Palavra. Coordenadora diocesana, acolhedora e sábia. Sempre com um livro e a palavra certa na hora certa.</div></div>
+  <div class="char-card"><div class="char-name">JOSÉ</div><div class="char-role">Idoso, 72 anos</div><div class="char-bio">Marceneiro aposentado com mãos calejadas e coração manso. Pai de família. A oficina era seu oratório e o trabalho, sua oração silenciosa.</div></div>
+  <div class="char-card"><div class="char-name">MIGUEL</div><div class="char-role">Jovem, 17 anos</div><div class="char-bio">Atleta que usa o esporte para evangelizar todos os ambientes onde está, com o seu testemunho. Energético, corajoso e construindo dia após dia o seu caminho com Deus.</div></div>
+  <div class="char-card"><div class="char-name">CLARA</div><div class="char-role">Criança, 9 anos</div><div class="char-bio">Menina simples que gosta de brincar. De uma oração que surpreende adultos com sua fé simples e profunda. Frequenta a catequese e reza pelo mundo com a confiança de quem nunca duvidou de Deus.</div></div>
+  <div class="char-card"><div class="char-name">TERESA</div><div class="char-role">Idosa, 78 anos</div><div class="char-bio">Avó de comunidade que cuida do jardim da paróquia e distribui rosas aos que chegam tristes. Oração, serviço e silêncio são os três pilares da sua vida.</div></div>
+</div>`},
+
+{title:"As Virtudes",eyebrow:"7 Cartas",render:()=>`
+<p class="prose">As Virtudes representam o heroísmo moral vivido pelo bem-aventurado. No lugar das armas do Detetive clássico, a força que transforma uma vida é a excelência moral e sobrenatural.</p>
+<p class="prose" style="font-weight:700;color:var(--navy)">Virtudes Teologais — infundidas diretamente por Deus na alma</p>
+<table class="vtable"><thead><tr><th>Virtude</th><th>Definição</th><th>Como se manifesta na vida</th></tr></thead><tbody>
+${[["FÉ","Adesão plena a Deus que Se revela","Na oração diária, nos sacramentos, no testemunho corajoso da fé diante do mundo"],["ESPERANÇA","Confiança inabalável na salvação","Na serenidade diante do sofrimento; na recusa ao desespero; na certeza de que Deus sempre salva"],["CARIDADE","Amor a Deus sobre tudo e ao próximo","No serviço generoso, no perdão dos inimigos, na doação sem esperar retorno"]].map(([v,d,m])=>`<tr><td class="vname">${v}</td><td>${d}</td><td>${m}</td></tr>`).join('')}
+</tbody></table>
+<p class="prose" style="font-weight:700;color:var(--navy);margin-top:24px">Virtudes Cardeais — cultivadas pelo esforço humano elevado pela graça</p>
+<table class="vtable"><thead><tr><th>Virtude</th><th>Definição</th><th>Como se manifesta na vida</th></tr></thead><tbody>
+${[["PRUDÊNCIA","Discernimento correto do bem a fazer","Na capacidade de tomar boas decisões, de ouvir antes de falar, de agir no momento certo"],["JUSTIÇA","Dar a cada um o que lhe é devido","No respeito aos direitos alheios, na honestidade, na coragem de defender os vulneráveis"],["FORTALEZA","Firmeza para perseverar no bem","Na resistência às pressões do mundo, na fidelidade nos momentos em que custou caro"],["TEMPERANÇA","Moderação dos prazeres e equilíbrio","No jejum, na sobriedade, no domínio dos impulsos e dos sentidos"]].map(([v,d,m])=>`<tr><td class="vname">${v}</td><td>${d}</td><td>${m}</td></tr>`).join('')}
+</tbody></table>`},
+
+{title:"Os Mistérios de Cristo",eyebrow:"4 Cartas",render:()=>`
+<p class="prose">Este jogo contempla os <strong>quatro grandes Mistérios da vida de Jesus Cristo</strong>, cada um um convite a uma forma particular de espiritualidade, oração e configuração com o Mestre.</p>
+<p class="prose" style="font-style:italic;color:var(--muted)">Todo cristão é chamado a viver o mistério completo de Cristo. Mas há almas especialmente marcadas por um desses mistérios — que rezaram com ele, sofreram nele, cresceram através dele. A pergunta do jogo é: qual mistério marcou mais profundamente a espiritualidade desse bem-aventurado?</p>
+<div class="mystery-grid">
+<div class="mcard m-inf"><div class="mcard-icon">✨</div><div class="mcard-name">INFÂNCIA</div><div class="mcard-desc">Encarnação, Natividade, Apresentação no Templo, Fuga para o Egito, Vida em Nazaré: o Deus que Se faz pequeno. <strong style="color:var(--inf)">Espiritualidade da simplicidade e confiança filial.</strong> Encontra Deus no escondimento, no cotidiano, nos pequenos. Espiritualidade da manjedoura.</div></div>
+<div class="mcard m-pub"><div class="mcard-icon">⚡</div><div class="mcard-name">VIDA PÚBLICA</div><div class="mcard-desc">Batismo no Jordão, tentações no deserto, chamado dos apóstolos, milagres, pregação, encontros com os necessitados, Transfiguração e Última Ceia: o Deus que se fez pão. <strong style="color:var(--pub)">Espiritualidade apostólica.</strong> Amor a Jesus Eucarístico.</div></div>
+<div class="mcard m-pax"><div class="mcard-icon">✝</div><div class="mcard-name">PAIXÃO</div><div class="mcard-desc">Getsêmani, prisão, flagelação, Cruz, morte e sepultura: o Cordeiro que carrega o pecado do mundo. <strong style="color:var(--pax)">Espiritualidade da reparação e compaixão com os que sofrem.</strong> A alma que encontra Deus no sofrimento redentor, na dor abraçada com amor.</div></div>
+<div class="mcard m-res"><div class="mcard-icon">☀</div><div class="mcard-name">RESSURREIÇÃO</div><div class="mcard-desc">Sepulcro vazio, aparições, Pentecostes, Ascensão: o triunfo de Cristo sobre o pecado e a morte. <strong style="color:var(--res)">Espiritualidade da esperança e do testemunho.</strong> Anuncia com certeza que o mal não tem a última palavra.</div></div>
+</div>
+<div class="callout info"><div class="callout-title">Nota Teológica sobre os Mistérios</div><p>Os 4 Mistérios correspondem às coroas do Rosário: <strong>Gozosos</strong> (Infância) · <strong>Luminosos</strong> de São João Paulo II (Vida Pública) · <strong>Dolorosos</strong> (Paixão) · <strong>Gloriosos</strong> (Ressurreição e Pentecostes). A espiritualidade cristã é vivenciada em torno de todos esses mistérios — todos são Jesus Cristo, todos são necessários. O jogo convida a contemplar cada um com profundidade.</p></div>`},
+
+{title:"Preparação",eyebrow:"Antes de Começar",render:()=>`
+<p class="prose">Siga exatamente esta sequência antes de iniciar cada partida:</p>
+<div class="steps">
+${[
+["Separe os três montes","Personagens (6 cartas), Virtudes (7) e Mistérios (4). Embaralhe cada monte separadamente."],
+["Reserve 3 cartas no centro","Retire 1 carta de cada monte sem olhar e coloque-as no centro da mesa. Ninguém mexe nessas cartas durante a partida."],
+["Distribua as cartas restantes","Junte os montes restantes num único baralho e distribua igualmente entre os jogadores. Cartas que sobrem ficam abertas no centro — são as Cartas Comunitárias, visíveis e conhecidas por todos."],
+["Preencha a ficha","Cada jogador olha suas cartas em segredo. Risque imediatamente todas que estão na sua mão — elas com certeza não estão no centro da mesa. Risque também as Cartas Comunitárias."],
+["Distribua a Ficha de Anotação e um lápis","1 por jogador."],
+["Começa o mais jovem","O jogo segue no sentido horário."],
+].map(([h,p],i)=>`<div class="step"><div class="step-num">${i+1}</div><div class="step-body"><h4>${h}</h4><p>${p}</p></div></div>`).join('')}
+</div>
+<div class="callout"><div class="callout-title">Atenção — sobre os Mistérios</div><p>Com apenas 4 cartas de Mistério, a probabilidade de que o Mistério reservado seja deduzido mais rapidamente é alta. Isso torna o jogo mais ágil, mas também mais tenso.</p></div>`},
+
+{title:"Como Jogar",eyebrow:"O Turno",render:()=>`
+<p class="prose">O jogo acontece em rodadas. Em cada rodada, cada jogador realiza <strong>uma Indagação</strong> na sua vez. O turno passa sempre no sentido horário. Não há tabuleiro nem dados — toda a ação acontece entre as cartas e as fichas de anotação.</p>
+<div class="ch-rule"></div><div class="ch-eyebrow">Etapa 1 — A Indagação</div>
+<p class="prose">O jogador da vez enuncia em voz alta uma hipótese completa com <strong>exatamente três elementos</strong>:</p>
+<div class="indagation"><p>"Eu indago que <strong>[PERSONAGEM]</strong> alcançou a Bem-aventurança,<br>vivendo heroicamente a virtude da/do <strong>[VIRTUDE]</strong>,<br>e sendo especialmente convidado(a) por Deus a contemplar e viver<br>o Mistério da <strong>[MISTÉRIO DA VIDA DE CRISTO]</strong>."</p></div>
+<p class="prose" style="font-style:italic;color:var(--muted)">Exemplo: "Eu indago que <strong style="color:var(--navy)">TERESA</strong> alcançou a Bem-aventurança, vivendo heroicamente a virtude da <strong style="color:var(--navy)">CARIDADE</strong>, e sendo especialmente convidada a contemplar e viver o Mistério da <strong style="color:var(--navy)">PAIXÃO</strong>."</p>
+<div class="ch-rule"></div><div class="ch-eyebrow">Etapa 2 — O Testemunho</div>
+<p class="prose">A partir do jogador à esquerda do indagador e seguindo em sentido horário, cada jogador verifica em segredo se possui alguma das três cartas citadas na Indagação.</p>
+<table class="vtable"><thead><tr><th>Situação</th><th>O que fazer</th></tr></thead><tbody>
+<tr><td class="vname" style="color:var(--green)">Tem 1 ou mais</td><td>Mostre secretamente <strong>uma</strong> dessas cartas ao jogador indagador — apenas a ele. Após mostrar, o ciclo encerra imediatamente.</td></tr>
+<tr><td class="vname" style="color:var(--red)">Não tem nenhuma</td><td>Diga em voz alta: "Não posso testemunhar." A obrigação de mostrar passa para o próximo jogador à esquerda, e assim por diante.</td></tr>
+</tbody></table>
+<p class="prose">O ciclo de testemunhos encerra assim que o primeiro jogador mostrar uma carta ao indagador. Os demais não precisam ser consultados naquela rodada.</p>
+<div class="callout"><div class="callout-title">Escolha estratégica no Testemunho</div><p>Se você tiver mais de uma das cartas citadas, <strong>você escolhe qual mostrar</strong>. Essa decisão é estratégica: mostrar a carta menos relevante pode desorientar o adversário e preservar informações valiosas.</p></div>
+<div class="ch-rule"></div><div class="ch-eyebrow">Etapa 3 — O Discernimento</div>
+<p class="prose">O indagador registra na Ficha de Anotação o que aprendeu:</p>
+<ul class="rules-list">
+<li><span class="icon-ok">✓</span>Se alguém mostrou uma carta: risque-a imediatamente na ficha — ela não está no centro.</li>
+<li><span class="icon-ok">✓</span>Se ninguém pôde testemunhar: as três cartas citadas são candidatas fortíssimas — marque-as como suspeitas.</li>
+<li><span class="icon-ok">✓</span>Se alguns jogadores puderam testemunhar e outros não: anote quem respondeu e quem não respondeu.</li>
+</ul>
+<p class="prose">Os demais jogadores também devem anotar o que observam — mesmo sem ter visto qual carta foi mostrada.</p>
+<div class="callout info"><div class="callout-title">Observação sobre os Mistérios</div><p>Como há apenas 4 cartas de Mistério, elas tendem a ser reveladas mais cedo. Se você já sabe quais três Mistérios estão fora do centro, o quarto é a solução — e metade do enigma está resolvida.</p></div>`},
+
+{title:"Revelação Final",eyebrow:"Como Vencer",render:()=>`
+<p class="prose">Quando um jogador acredita ter descoberto as três cartas reservadas no centro, ele pode — em seu turno — fazer a <strong>Revelação Final</strong>.</p>
+<div class="steps">
+${[["Anuncie","Diga em voz alta: \"Faço a Revelação Final!\""],["Declare","Enuncie a combinação completa: Personagem, Virtude e Mistério da Vida de Cristo."],["Verifique","Em silêncio, sozinho, confere as três cartas do centro da mesa."],["Revele o resultado","Se acertou, mostra as cartas a todos."]].map(([h,p],i)=>`<div class="step"><div class="step-num">${i+1}</div><div class="step-body"><h4>${h}</h4><p>${p}</p></div></div>`).join('')}
+</div>
+<table class="vtable"><thead><tr><th>Resultado</th><th>Consequência</th></tr></thead><tbody>
+<tr><td class="vname" style="color:var(--green)">✓ Acertou os 3</td><td><strong>VITÓRIA!</strong> Mostra as cartas a todos e narra a história do bem-aventurado revelado.</td></tr>
+<tr><td class="vname" style="color:var(--red)">✗ Errou algum</td><td><strong>Derrota silenciosa.</strong> Recoloca as cartas no centro sem revelar o conteúdo. É eliminado da disputa, mas permanece à mesa.</td></tr>
+</tbody></table>
+<div class="callout info"><div class="callout-title">A Derrota Silenciosa</div><p>O jogador eliminado permanece sentado à mesa, mas não pode mais fazer Indagações nem tentar nova Revelação Final. Os outros não sabem o que ele viu. A partida continua entre os demais.</p></div>
+<p class="prose" style="font-style:italic;color:var(--muted)">Se todos os jogadores tentarem a Revelação Final e errarem, as cartas são reveladas para todos. Nessa partida, o Mistério permaneceu além do discernimento humano — um sinal de que a graça é sempre maior do que podemos imaginar.</p>`},
+
+{title:"Regras Essenciais",eyebrow:"Permitido e Proibido",render:()=>`
+<p class="prose">A honestidade total é o fundamento deste jogo. A emoção vem do discernimento e da dedução honesta — virtudes que o próprio jogo exercita em quem joga.</p>
+<p class="prose" style="font-weight:700;color:var(--green)">É PERMITIDO</p>
+<ul class="rules-list">
+${["Escolher qual carta mostrar quando você tem mais de uma das cartas citadas.","Fazer Indagações estratégicas citando cartas que você já sabe onde estão.","Anotar qualquer informação observada, mesmo em Testemunhos alheios.","Pedir que o indagador repita a Indagação se você não ouviu claramente."].map(t=>`<li><span class="icon-ok">✓</span>${t}</li>`).join('')}
+</ul>
+<p class="prose" style="font-weight:700;color:var(--red);margin-top:24px">É PROIBIDO</p>
+<ul class="rules-list">
+${["Mentir ou blefar — em qualquer momento do jogo.","Omitir uma carta que você possui e que foi citada na Indagação.","Mostrar uma carta que NÃO foi citada na Indagação.","Mostrar sua carta a qualquer outro jogador além do indagador.","Revelar ao grupo qual carta você mostrou em um Testemunho.","Comunicar informações por gestos, cochichos ou sinais a outros jogadores.","Ver as cartas do centro fora do momento da Revelação Final.","Revelar as cartas após uma Revelação Final errada."].map(t=>`<li><span class="icon-no">✗</span>${t}</li>`).join('')}
+</ul>
+<div class="callout" style="margin-top:24px"><div class="callout-title">A Intercessão — a mecânica no lugar do blefe</div><p>Nos jogos de investigação, jogadores podem blefar sobre os elementos da hipótese. No Santo Enigma, o blefe é substituído pela <strong>Intercessão</strong>, inspirada na doutrina da Comunhão dos Santos: pedimos ajuda uns aos outros na caminhada para Deus.</p><p style="margin-top:10px">Uma vez por turno, <strong>antes</strong> da Indagação, o jogador pode gastar 1 oportunidade de Intercessão para perguntar a qualquer jogador: <em>"Você tem a carta de [X]?"</em> O jogador consultado responde honestamente — <strong>somente ele pode escutar a resposta</strong>. Cada jogador tem apenas <strong>2 oportunidades de Intercessão</strong> por partida. Após usá-la, ainda realiza sua Indagação normalmente.</p></div>`},
+
+{title:"Ficha de Anotação",eyebrow:"Ferramenta de Discernimento",render:()=>`
+<p class="prose">A Ficha de Anotação é sua principal ferramenta. Um registro preciso é o maior diferencial entre vencer e perder.</p>
+<div class="ficha"><div class="ficha-hdr"><span>FICHA DE ANOTAÇÃO</span><span style="opacity:.6;font-size:11px">Santo Enigma</span></div><div class="ficha-body">
+<div class="ficha-col"><h4 class="cp">Personagens</h4>${["Rafael","Ana","José","Miguel","Clara","Teresa"].map(n=>`<div class="fi"><div class="cb"></div>${n}</div>`).join('')}</div>
+<div class="ficha-col"><h4 class="cv">Virtudes</h4>${["Fé","Esperança","Caridade","Prudência","Justiça","Fortaleza","Temperança"].map(n=>`<div class="fi"><div class="cb"></div>${n}</div>`).join('')}</div>
+<div class="ficha-col"><h4 class="cm">Mistérios</h4>${["Infância","Vida Pública","Paixão","Ressurreição"].map(n=>`<div class="fi"><div class="cb"></div>${n}</div>`).join('')}<div style="margin-top:14px;border-top:1px solid var(--gold-lt);padding-top:10px"><div style="font-family:'Cinzel',serif;font-size:9px;color:var(--gold);letter-spacing:.2em;margin-bottom:8px">INTERCESSÕES</div><div class="fi"><div class="cb"></div>Oportunidade 1</div><div class="fi"><div class="cb"></div>Oportunidade 2</div></div></div>
+</div></div>
+<p class="prose">Risque <strong>imediatamente</strong> ao início todas as cartas na sua mão e as Cartas Comunitárias. Durante a partida, risque cada carta mostrada em Testemunho.</p>
+<p class="prose">Use o verso da ficha (ou papel avulso) para anotar as Indagações por rodada: turno / hipótese feita / quem respondeu ou não respondeu.</p>
+<div class="callout info"><div class="callout-title">Dica especial — os Mistérios</div><p>Com apenas 4 cartas de Mistério, elas costumam ser identificadas nas primeiras rodadas. Quando você já sabe os 3 Mistérios fora do centro, o quarto é a solução — e metade do enigma está resolvida.</p></div>`},
+
+{title:"Modos de Jogo",eyebrow:"Variações",render:()=>`
+<p class="prose">Santo Enigma pode ser jogado de diferentes formas segundo o grupo e o contexto.</p>
+<div class="mode-grid">
+<div class="mode-card"><h4>O Concílio — Padrão</h4><p>Todas as 17 cartas, Intercessão ativa, Derrota Silenciosa. 3 a 6 jogadores. 30–50 minutos.</p></div>
+<div class="mode-card"><h4>A Peregrinação — Familiar</h4><p>4 personagens, apenas as 3 virtudes teologais, Testemunhos visíveis a todos. Sem eliminação. Ideal para crianças a partir de 8 anos.</p></div>
+<div class="mode-card"><h4>A Formação — Catequético</h4><p>Antes de cada Indagação, o jogador comenta brevemente a virtude ou o Mistério citado. Ao final, o grupo pode formular juntos a história do mistério revelado, onde cada um imagina e relata uma parte. O animador pode fazer associações com a vida dos santos.</p></div>
+<div class="mode-card"><h4>Partida Silenciosa — Contemplativo</h4><p>As Indagações não são feitas em voz alta, mas em <strong>mímica</strong>. O jogador responde ao Testemunho após desvendar a mímica e mostrar a carta que está sendo encenada. Quem falar, passa a vez.</p></div>
+</div>
+<div class="callout" style="margin-top:8px"><div class="callout-title">Sugestão para o Modo Catequético</div><p>Ao citar a Paixão: convide o grupo a pensar em quem soube carregar o sofrimento com sentido. Ao citar a Infância: identifiquem virtudes da simplicidade no cotidiano. Ao citar a Vida Pública: conecte com o serviço e o anúncio corajoso no próprio ambiente. Ao citar a Ressurreição: pergunte "O que em minha vida precisa ressurgir?"</p></div>`},
+
+{title:"Encerramento",eyebrow:"Narrativa Final",render:()=>`
+<p class="prose">Ao final de cada partida, o vencedor — ou o grupo, se ninguém acertou — mostra as cartas e narra a história do bem-aventurado revelado. Esta é a parte mais rica: dar vida à combinação descoberta e contemplar o que ela significa.</p>
+<div class="indagation" style="text-align:left"><p style="margin-bottom:12px">"Deus, em Sua misericórdia, agraciou <strong>[PERSONAGEM]</strong> com a Bem-Aventurança.</p><p style="margin-bottom:12px">Ao longo de toda a sua vida, viveu heroicamente a virtude da/do <strong>[VIRTUDE]</strong>.</p><p style="margin-bottom:12px">E ao longo dessa jornada, foi especialmente convidado(a) a contemplar e a viver o Mistério de Cristo em Sua <strong>[MISTÉRIO]</strong>.</p><p>Como [nome], que carregou a Cruz com amor / que viveu a alegria da Ressurreição / que imitou a simplicidade da Manjedoura / que serviu com o ardor da Vida Pública — que também nós sejamos configurados a Cristo no mistério que Ele nos confiar."</p></div>
+<p class="prose">Depois da narrativa, o grupo pode discutir: por que essa combinação faz sentido? Que santos viveram essa mesma espiritualidade? Qual Mistério de Cristo mais ressoa com minha caminhada agora?</p>
+<div class="callout info"><div class="callout-title">Oração de Encerramento</div><p>Senhor Jesus, obrigado pelo dom desta partida e pelo tempo passado juntos. Que os Mistérios da Sua vida que contemplamos não sejam apenas história, mas convite: a nascer contigo em simplicidade, a servir contigo com coragem, a carregar com sentido a nossa própria Cruz, e a ressurgir, a cada dia, para uma vida nova.<br><br><em>Todos os Santos de Deus, intercedei por nós. Amém.</em></p></div>
+<div class="closing"><span class="cross-row">✝ &nbsp; ✝ &nbsp; ✝</span><blockquote>"Eu sou o caminho, a verdade e a vida."</blockquote><cite>— João 14,6</cite><div class="amdg">AD MAIOREM DEI GLORIAM</div><div class="amdg-sub">Para a Maior Glória de Deus · São Paulo, 2026</div></div>`},
+];
+
+let cur=-1;
+
+function buildSidebar(){
+  const nav=document.getElementById('sb-nav');
+  nav.innerHTML='<div class="sb-label">Capítulos</div>'+
+    chapters.map((c,i)=>`<button class="sb-item${i===cur?' active':''}" onclick="goto(${i})"><span class="sb-num">${String(i+1).padStart(2,'0')}</span><span>${c.title}</span></button>`).join('');
+}
+
+function goto(i){
+  cur=i;
+  const c=chapters[i];
+  document.getElementById('chapter').innerHTML=`<div class="ch-eyebrow">${c.eyebrow}</div><div class="ch-title">${c.title}</div><div class="ch-rule"></div>${c.render()}`;
+  document.getElementById('nav-prog').textContent=`${i+1} / ${chapters.length}`;
+  document.getElementById('btn-prev').disabled=i===0;
+  document.getElementById('btn-next').disabled=i===chapters.length-1;
+  document.getElementById('cover').style.display='none';
+  document.querySelector('main').style.display='flex';
+  document.querySelector('main').style.flexDirection='column';
+  buildSidebar();
+  document.getElementById('chapter').scrollIntoView({behavior:'smooth',block:'start'});
+  if(window.innerWidth<=720)closeSidebar();
+}
+
+function prevChapter(){if(cur>0)goto(cur-1);}
+function nextChapter(){if(cur<chapters.length-1)goto(cur+1);}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
+
+document.querySelector('main').style.display='none';
+buildSidebar();
+</script>
+</body>
+</html>
